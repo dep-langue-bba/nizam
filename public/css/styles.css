@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+
+body {
+  font-family: 'Cairo', sans-serif;
+  background-color: #fcfbf9;
+}
+
+/* خلفية هندسية متناسقة وناعمة */
+.bg-subtle {
+  background-color: #fcfbf9;
+  background-image: url('../assets/bg-pattern.svg');
+  background-repeat: repeat;
+  background-size: 45px 45px;
+}
+
+/* تأثير الزجاج الشفاف الراقي للرأسية والبطاقات */
+.glass-header {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 2px solid rgba(12, 94, 42, 0.15);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -12px rgba(12, 94, 42, 0.12);
+  border-color: #dfab00;
+}
+
+.glass-card:hover .icon-box {
+  background: #0c5e2a;
+  color: #dfab00;
+  border-color: transparent;
+}
+
+.glass-card:hover .arrow {
+  transform: translateX(-6px);
+  color: #0c5e2a;
+}
+
+.glass-card:hover .card-title {
+  color: #0c5e2a;
+}
+
+.icon-box, .arrow, .card-title {
+  transition: all 0.3s ease;
+}
+
+a:focus-visible {
+  outline: 2px solid #0c5e2a;
+  outline-offset: 3px;
+}

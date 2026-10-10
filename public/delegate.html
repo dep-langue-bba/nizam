@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نِظَام - بوابة ممثل الفوج الذكية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style> body { font-family: 'Cairo', sans-serif; } </style>
+</head>
+<body class="bg-slate-100 min-h-screen p-4 text-slate-800">
+
+  <!-- شاشة تسجيل الدخول برمز PIN -->
+  <div id="loginSection" class="max-w-md mx-auto mt-16 bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+    <div class="text-center mb-6">
+      <h1 class="text-3xl font-black text-amber-500 mb-1">نِظَام</h1>
+      <p class="text-sm text-slate-500">منصة المتابعة الذكية - ممثلو الأفواج</p>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-semibold mb-2">اختر الفوج الخاص بك:</label>
+        <select id="groupSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+          <option value="">-- جارِ تحميل الأفواج --</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-2">رمز الدخول (PIN):</label>
+        <input type="password" id="pinInput" placeholder="أدخل رمز الفوج..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-sm text-center tracking-widest focus:ring-2 focus:ring-amber-500 outline-none">
+      </div>
+      <button onclick="login()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-lg transition shadow-md">
+        دخول للبوابة
+      </button>
+      <p id="loginError" class="text-rose-600 text-xs text-center hidden"></p>
+    </div>
+  </div>
+
+  <!-- لوحة تفاعل ممثل الفوج (مخفية حتى الدخول) -->
+  <main id="appSection" class="max-w-2xl mx-auto space-y-6 hidden">
+    
+    <!-- الهيدر -->
+    <header class="bg-slate-900 text-white rounded-2xl p-5 shadow-lg flex justify-between items-center">
+      <div>
+        <h2 id="groupNameDisplay" class="text-lg font-bold text-amber-400"></h2>
+        <p class="text-xs text-slate-300 mt-0.5">اختر اليوم وسجل حضور الحصص أو أضفها لجدولك الثابت</p>
+      </div>
+      <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-2 rounded-lg font-semibold transition">خروج</button>
+    </header>
+
+    <!-- اسم الموثق -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+      <label class="block text-xs font-semibold mb-1 text-slate-600">اسم ممثل الفوج (للتوثيق):</label>
+      <input type="text" id="delegateName" placeholder="أدخل اسمك الكريم..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm outline-none focus:border-amber-500">
+    </div>
+
+    <!-- أزرار اختيار الأيام -->
+    <div class="flex gap-2 overflow-x-auto pb-2" id="daysContainer">
+      <button onclick="selectDay('السبت')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-50 transition active">السبت</button>
+      <button onclick="selectDay('الأحد')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-50 transition">الأحد</button>
+      <button onclick="selectDay('الإثنين')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-50 transition">الإثنين</button>
+      <button onclick="selectDay('الثلاثاء')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-50 transition">الثلاثاء</button>
+      <button onclick="selectDay('الأربعاء')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-50 transition">الأربعاء</button>
+      <button onclick="selectDay('الخميس')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-50 transition">الخميس</button>
+    </div>
+
+    <!-- عرض الحصص الخاصة باليوم المختار -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+      <div class="flex justify-between items-center border-b pb-3 border-slate-100">
+        <h3 id="currentDayTitle" class="font-bold text-slate-800 text-base">حصص يوم: السبت</h3>
+        <button onclick="openAddModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs px-3 py-2 rounded-lg font-bold transition shadow-sm">+ إضافة حصة ثابتة</button>
+      </div>
+
+      <div id="dayScheduleList" class="space-y-3">
+        <!-- يتم تعبئتها ديناميكياً -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- نافذة منبثقة (Modal) لإضافة حصة جديدة للجدول الثابت -->
+  <div id="addModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+      <h3 class="font-bold text-slate-900 text-lg border-b pb-2">إضافة حصة للجدول الثابت</h3>
+      
+      <div>
+        <label class="block text-xs font-semibold mb-1">التوقيت الزمني:</label>
+        <select id="modalTime" class="w-full bg-slate-50 border rounded-lg p-2.5 text-sm outline-none">
+          <option value="08:00 - 09:30">08:00 - 09:30</option>
+          <option value="09:35 - 11:05">09:35 - 11:05</option>
+          <option value="11:10 - 12:40">11:10 - 12:40</option>
+          <option value="12:45 - 14:15">12:45 - 14:15</option>
+          <option value="14:20 - 15:50">14:20 - 15:50</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold mb-1">اسم المقياس:</label>
+        <input type="text" id="modalSubject" placeholder="مثال: اللسانيات الحاسوبية..." class="w-full bg-slate-50 border rounded-lg p-2.5 text-sm outline-none">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold mb-1">اسم الأستاذ:</label>
+        <input type="text" id="modalTeacher" placeholder="مثال: د. بلميهوب..." class="w-full bg-slate-50 border rounded-lg p-2.5 text-sm outline-none">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold mb-1">القاعة / المدرج:</label>
+        <input type="text" id="modalRoom" placeholder="مثال: قاعة 12 أو المدرج 02..." class="w-full bg-slate-50 border rounded-lg p-2.5 text-sm outline-none">
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="saveNewSchedule()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm transition">حفظ في الجدول</button>
+        <button onclick="closeAddModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2.5 rounded-lg text-sm transition">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentGroup = null;
+    let currentSchedule = [];
+    let selectedDay = 'السبت';
+
+    async function loadGroups() {
+      const res = await fetch('/api/init');
+      const data = await res.json();
+      const select = document.getElementById('groupSelect');
+      select.innerHTML = '<option value="">-- اختر الفوج --</option>';
+      data.groups.forEach(g => {
+        select.innerHTML += `<option value="${g.id}">${g.name}</option>`;
+      });
+    }
+
+    async function login() {
+      const groupId = document.getElementById('groupSelect').value;
+      const pin = document.getElementById('pinInput').value;
+      const errorEl = document.getElementById('loginError');
+      
+      if (!groupId || !pin) {
+        errorEl.textContent = 'يرجى اختيار الفوج ووضع الرمز السري.';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/delegate/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ groupId, pin })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          currentGroup = data.group;
+          currentSchedule = data.schedule;
+          document.getElementById('loginSection').classList.add('hidden');
+          document.getElementById('appSection').classList.remove('hidden');
+          document.getElementById('groupNameDisplay').textContent = currentGroup.name;
+          renderDaySchedule();
+        } else {
+          errorEl.textContent = data.error;
+          errorEl.classList.remove('hidden');
+        }
+      } catch (e) {
+        errorEl.textContent = 'خطأ في الاتصال بالخادم.';
+        errorEl.classList.remove('hidden');
+      }
+    }
+
+    function selectDay(day) {
+      selectedDay = day;
+      document.querySelectorAll('.day-btn').forEach(btn => {
+        if(btn.textContent.includes(day)) {
+          btn.classList.add('bg-amber-500', 'text-slate-950', 'border-amber-500');
+          btn.classList.remove('bg-white', 'text-slate-700');
+        } else {
+          btn.classList.remove('bg-amber-500', 'text-slate-950', 'border-amber-500');
+          btn.classList.add('bg-white', 'text-slate-700');
+        }
+      });
+      document.getElementById('currentDayTitle').textContent = `حصص يوم: ${day}`;
+      renderDaySchedule();
+    }
+
+    function renderDaySchedule() {
+      const container = document.getElementById('dayScheduleList');
+      container.innerHTML = '';
+
+      const daySchedules = currentSchedule.filter(s => s.day === selectedDay);
+
+      if (daySchedules.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 text-slate-400 text-sm space-y-2">
+            <p>لا توجد حصص محفوظة لهذا اليوم بعد.</p>
+            <p class="text-xs">اضغط على زر "+ إضافة حصة ثابتة" لتسجيل جدول هذا اليوم لتبقى محفوضة دائماً.</p>
+          </div>`;
+        return;
+      }
+
+      daySchedules.forEach(s => {
+        container.innerHTML += `
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded">${s.time}</span>
+                <h4 class="font-bold text-slate-800 text-base mt-1">${s.subject}</h4>
+                <p class="text-xs text-slate-500">الأستاذ: ${s.teacher} | المكان: ${s.room}</p>
+              </div>
+              <button onclick="deleteSchedule('${s.id}')" class="text-rose-500 hover:text-rose-700 text-xs font-semibold px-2 py-1 bg-rose-50 rounded border border-rose-100">حذف الحصة 🗑️</button>
+            </div>
+
+            <!-- أزرار الإنجاز -->
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200/60">
+              <button onclick="submitReport('${s.id}', '${s.subject}', '${s.teacher}', '${s.time}', 'completed')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs py-2 rounded-lg font-bold transition">تم الإنجاز 🟢</button>
+              <button onclick="submitReport('${s.id}', '${s.subject}', '${s.teacher}', '${s.time}', 'absent')" class="bg-rose-600 hover:bg-rose-700 text-white text-xs py-2 rounded-lg font-bold transition">لم تدرس 🔴</button>
+              <button onclick="submitReport('${s.id}', '${s.subject}', '${s.teacher}', '${s.time}', 'delayed')" class="bg-amber-500 hover:bg-amber-600 text-white text-xs py-2 rounded-lg font-bold transition">تأخر/تغيير 🟠</button>
+            </div>
+            <input type="text" id="notes_${s.id}" placeholder="ملاحظة إضافية (اختياري)..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none focus:border-amber-500">
+          </div>
+        `;
+      });
+    }
+
+    function openAddModal() {
+      document.getElementById('addModal').classList.remove('hidden');
+      document.getElementById('addModal').classList.add('flex');
+    }
+
+    function closeAddModal() {
+      document.getElementById('addModal').classList.remove('flex');
+      document.getElementById('addModal').classList.add('hidden');
+    }
+
+    async function saveNewSchedule() {
+      const time = document.getElementById('modalTime').value;
+      const subject = document.getElementById('modalSubject').value.trim();
+      const teacher = document.getElementById('modalTeacher').value.trim();
+      const room = document.getElementById('modalRoom').value.trim();
+
+      if (!subject || !teacher) {
+        alert('يرجى إدخال اسم المقياس والأستاذ على الأقل.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/schedules', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ groupId: currentGroup.id, day: selectedDay, time, subject, teacher, room })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          currentSchedule.push(data.schedule);
+          closeAddModal();
+          renderDaySchedule();
+          // تفريغ الحقول
+          document.getElementById('modalSubject').value = '';
+          document.getElementById('modalTeacher').value = '';
+          document.getElementById('modalRoom').value = '';
+        } else {
+          alert(data.error);
+        }
+      } catch (e) {
+        alert('خطأ في الاتصال بالخادم.');
+      }
+    }
+
+    async function deleteSchedule(scheduleId) {
+      if (!confirm('هل أنت متأكد من حذف هذه الحصة من الجدول الثابت؟')) return;
+
+      try {
+        const res = await fetch(`/api/schedules/${scheduleId}`, { method: 'DELETE' });
+        if (res.ok) {
+          currentSchedule = currentSchedule.filter(s => s.id !== scheduleId);
+          renderDaySchedule();
+        } else {
+          alert('فشل في حذف الحصة');
+        }
+      } catch (e) {
+        alert('خطأ في الاتصال.');
+      }
+    }
+
+    async function submitReport(scheduleId, subject, teacher, time, status) {
+      const delegateName = document.getElementById('delegateName').value.trim() || 'ممثل الفوج';
+      const notesInput = document.getElementById(`notes_${scheduleId}`);
+      const notes = notesInput ? notesInput.value.trim() : '';
+
+      try {
+        const res = await fetch('/api/reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            groupId: currentGroup.id,
+            scheduleId,
+            subject,
+            teacher,
+            time,
+            status,
+            notes,
+            delegateName
+          })
+        });
+
+        if (res.ok) {
+          alert('✅ تم إرسال تقرير الحصة بنجاح إلى الإدارة');
+          if(notesInput) notesInput.value = '';
+        } else {
+          alert('❌ حدث خطأ أثناء إرسال التقرير');
+        }
+      } catch (e) {
+        alert('❌ خطأ في الاتصال بالخادم');
+      }
+    }
+
+    function logout() {
+      currentGroup = null;
+      currentSchedule = [];
+      document.getElementById('pinInput').value = '';
+      document.getElementById('appSection').classList.add('hidden');
+      document.getElementById('loginSection').classList.remove('hidden');
+    }
+
+    window.onload = loadGroups;
+  </script>
+</body>
+</html>

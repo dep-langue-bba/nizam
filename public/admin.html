@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نِظَام - لوحة قيادة رئيس القسم</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; }
+
+    /* تنسيقات خاصة بالطباعة الرسمية للتقارير */
+    @media print {
+      body {
+        background-color: white !important;
+        color: #000 !important;
+      }
+      header, #loginSection, .no-print, button, select, .print-hide {
+        display: none !important;
+      }
+      /* إظهار ترويسة الطباعة الرسمية */
+      .official-print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #111;
+        padding-bottom: 15px;
+      }
+      main {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .print-container {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+      }
+      table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+      }
+      th, td {
+        border: 1px solid #333 !important;
+        padding: 8px !important;
+        font-size: 11px !important;
+        color: #000 !important;
+        text-align: right !important;
+      }
+      th {
+        background-color: #f1f5f9 !important;
+      }
+    }
+    .official-print-header {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col">
+
+  <!-- شاشة الدخول للإدارة -->
+  <div id="loginSection" class="max-w-md w-full mx-auto mt-24 bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
+    <div class="text-center mb-6">
+      <h2 class="text-3xl font-black text-slate-900 mb-1">نِظَام</h2>
+      <p class="text-xs text-amber-600 font-bold tracking-widest uppercase">بوابة الإدارة المركزية</p>
+    </div>
+    <div class="space-y-4">
+      <input type="password" id="adminPassword" placeholder="أدخل كلمة مرور الإدارة..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-center text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+      <button onclick="loginAdmin()" class="w-full bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold py-3 rounded-xl transition shadow-md text-sm">
+        تسجيل الدخول للإدارة
+      </button>
+      <p id="adminError" class="text-rose-600 text-xs text-center hidden font-semibold"></p>
+    </div>
+  </div>
+
+  <!-- لوحة القيادة الذكية (مخفية حتى تسجيل الدخول) -->
+  <main id="appSection" class="hidden flex-1 flex flex-col">
+    
+    <!-- الشريط العلوي -->
+    <header class="bg-slate-900 text-white shadow-md border-b border-amber-500/30 sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="bg-amber-500 text-slate-950 font-black text-lg px-3 py-1 rounded-lg">نِظَام</span>
+        <div>
+          <h1 class="font-bold text-base leading-tight">قسم اللغة والأدب العربي</h1>
+          <p class="text-[11px] text-slate-400">جامعة محمد البشير الإبراهيمي</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="printOfficialReport()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition shadow-sm">
+          🖨️ طباعة التقرير الرسمي
+        </button>
+        <button onclick="fetchData()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition">
+          🔄 تحديث البيانات
+        </button>
+        <button onclick="logoutAdmin()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">خروج</button>
+      </div>
+    </header>
+
+    <div class="max-w-7xl w-full mx-auto px-4 py-6 space-y-6 flex-1">
+      
+      <!-- ترويسة الطباعة الرسمية (تظهر حصرياً عند الطباعة أو التصدير) -->
+      <div class="official-print-header">
+        <p class="text-xs font-bold mb-1">الجمهورية الجزائرية الديمقراطية الشعبية — وزارة التعليم العالي والبحث العلمي</p>
+        <h2 class="text-sm font-bold mb-0.5">جامعة محمد البشير الإبراهيمي — برج بوعريريج</h2>
+        <p class="text-xs mb-2">كلية الآداب واللغات · قسم اللغة والأدب العربي</p>
+        <h1 class="text-base font-extrabold mt-3 border-t pt-2 border-slate-400">التقرير الرسمي لمتابعة الحصص والبيداغوجيا (نِظَام)</h1>
+        <p id="printDate" class="text-[11px] text-slate-600 mt-1"></p>
+      </div>
+
+      <!-- قسم الحصص الجارية الآن (Live Now) -->
+      <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl p-6 shadow-lg border border-amber-500/30 print-hide">
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-emerald-500 rounded-full animate-ping"></span>
+            <h2 class="font-bold text-amber-400 text-base">الحصص التي تُقدم الآن في القسم (متابعة حية)</h2>
+          </div>
+          <span id="currentTimeDisplay" class="text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700"></span>
+        </div>
+        <div id="liveNowContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- يتم تعبئتها برمجياً -->
+        </div>
+      </div>
+
+      <!-- بطاقات الإحصائيات السريعة -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 print-hide">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+          <p class="text-xs font-semibold text-slate-500">إجمالي التقارير المستلمة</p>
+          <h3 id="statTotal" class="text-3xl font-extrabold text-slate-800 mt-2">0</h3>
+        </div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-emerald-100 bg-emerald-50/20">
+          <p class="text-xs font-semibold text-emerald-600">حصص تم إنجازها</p>
+          <h3 id="statCompleted" class="text-3xl font-extrabold text-emerald-700 mt-2">0</h3>
+        </div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-rose-100 bg-rose-50/20">
+          <p class="text-xs font-semibold text-rose-600">غيابات / لم تُدرس</p>
+          <h3 id="statAbsent" class="text-3xl font-extrabold text-rose-700 mt-2">0</h3>
+        </div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-amber-100 bg-amber-50/20">
+          <p class="text-xs font-semibold text-amber-600">تأخر / تغطية خاصة</p>
+          <h3 id="statDelayed" class="text-3xl font-extrabold text-amber-700 mt-2">0</h3>
+        </div>
+      </div>
+
+      <!-- قسم الرسوم البيانية التفاعلية -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 print-hide">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 md:col-span-2 flex flex-col justify-center">
+          <h3 class="font-bold text-slate-800 text-sm mb-3">توزيع حالات الحصص في القسم</h3>
+          <div class="h-48 flex justify-center">
+            <canvas id="statusChart"></canvas>
+          </div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold text-slate-800 text-sm mb-1">مؤشر الانضباط العام</h3>
+            <p class="text-xs text-slate-400">نسبة الحصص المنجزة مقارنة بالغيابات</p>
+          </div>
+          <div class="text-center py-4">
+            <span id="complianceRate" class="text-4xl font-black text-emerald-600">100%</span>
+            <span class="block text-xs text-slate-500 mt-1">معدل الالتزام التعليمي</span>
+          </div>
+          <div class="text-[11px] text-slate-400 bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-center">
+            تُحسب البيانات لحظياً بناءً على تقارير ممثلي الأفواج.
+          </div>
+        </div>
+      </div>
+
+      <!-- جدول السجل الكامل للتقارير -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden print-container">
+        <div class="p-5 border-b border-slate-100 flex justify-between items-center print-hide">
+          <h3 class="font-bold text-slate-800 text-base">سجل التقارير اليومية المباشر</h3>
+          <select id="statusFilter" onchange="renderReportsTable()" class="bg-slate-50 border border-slate-300 rounded-lg text-xs p-2 outline-none">
+            <option value="all">جميع الحالات</option>
+            <option value="completed">الإنجاز فقط</option>
+            <option value="absent">الغيابات فقط</option>
+            <option value="delayed">التأخر فقط</option>
+          </select>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-right text-sm">
+            <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 text-xs">
+              <tr>
+                <th class="p-4">التوقيت والتاريخ</th>
+                <th class="p-4">المقياس</th>
+                <th class="p-4">الأستاذ</th>
+                <th class="p-4">الفوج</th>
+                <th class="p-4">حالة الحصة</th>
+                <th class="p-4">ملاحظات وموثق التقرير</th>
+              </tr>
+            </thead>
+            <tbody id="reportsTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    let reportsData = [];
+    let groupsMap = {};
+    let allSchedules = [];
+    let myChart = null;
+
+    async function loginAdmin() {
+      const password = document.getElementById('adminPassword').value;
+      const errorEl = document.getElementById('adminError');
+      
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        if (res.ok) {
+          document.getElementById('loginSection').classList.add('hidden');
+          document.getElementById('appSection').classList.remove('hidden');
+          
+          const initRes = await fetch('/api/init');
+          const initData = await initRes.json();
+          initData.groups.forEach(g => groupsMap[g.id] = g.name);
+
+          const schedRes = await fetch('/api/all-schedules');
+          allSchedules = await schedRes.json();
+          
+          fetchData();
+        } else {
+          errorEl.textContent = 'كلمة المرور غير صحيحة';
+          errorEl.classList.remove('hidden');
+        }
+      } catch (e) {
+        errorEl.textContent = 'خطأ في الاتصال بالسيرفر';
+        errorEl.classList.remove('hidden');
+      }
+    }
+
+    async function fetchData() {
+      try {
+        const res = await fetch('/api/reports');
+        reportsData = await res.json();
+        
+        updateStats();
+        renderChart();
+        renderLiveNow();
+        renderReportsTable();
+      } catch (e) {
+        console.error('خطأ في جلب التقارير');
+      }
+    }
+
+    function updateStats() {
+      const total = reportsData.length;
+      const completed = reportsData.filter(r => r.status === 'completed').length;
+      const absent = reportsData.filter(r => r.status === 'absent').length;
+      const delayed = reportsData.filter(r => r.status === 'delayed').length;
+
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statCompleted').textContent = completed;
+      document.getElementById('statAbsent').textContent = absent;
+      document.getElementById('statDelayed').textContent = delayed;
+
+      if(total > 0) {
+        const rate = Math.round((completed / total) * 100);
+        document.getElementById('complianceRate').textContent = rate + '%';
+      }
+    }
+
+    function renderChart() {
+      const completed = reportsData.filter(r => r.status === 'completed').length;
+      const absent = reportsData.filter(r => r.status === 'absent').length;
+      const delayed = reportsData.filter(r => r.status === 'delayed').length;
+
+      const ctx = document.getElementById('statusChart').getContext('2d');
+      if (myChart) myChart.destroy();
+
+      myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['تم الإنجاز', 'غياب / لم تدرس', 'تأخر أو تغييز'],
+          datasets: [{
+            data: [completed, absent, delayed],
+            backgroundColor: ['#059669', '#E11D48', '#D97706'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { font: { family: 'Cairo', size: 12 } } }
+          }
+        }
+      });
+    }
+
+    function renderLiveNow() {
+      const container = document.getElementById('liveNowContainer');
+      container.innerHTML = '';
+
+      const now = new Date();
+      const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+      const currentDay = days[now.getDay()];
+      document.getElementById('currentTimeDisplay').textContent = `اليوم: ${currentDay} | الساعة: ${now.toLocaleTimeString('ar-DZ', {hour: '2-digit', minute:'2-digit'})}`;
+
+      const todaySchedules = allSchedules.filter(s => s.day === currentDay);
+
+      if (todaySchedules.length === 0) {
+        container.innerHTML = '<p class="text-xs text-slate-400 col-span-3 text-center py-4">لا توجد حصص مجدولة مسجلة لهذا اليوم حالياً.</p>';
+        return;
+      }
+
+      todaySchedules.slice(0, 3).forEach(s => {
+        container.innerHTML += `
+          <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 text-xs space-y-1">
+            <div class="flex justify-between font-bold text-amber-400">
+              <span>${s.subject}</span>
+              <span>${s.time}</span>
+            </div>
+            <p class="text-slate-300">الأستاذ: ${s.teacher}</p>
+            <p class="text-slate-400 text-[11px]">الفوج: ${groupsMap[s.groupId] || s.groupId} | المكان: ${s.room}</p>
+          </div>
+        `;
+      });
+    }
+
+    function renderReportsTable() {
+      const tbody = document.getElementById('reportsTableBody');
+      const filter = document.getElementById('statusFilter').value;
+      tbody.innerHTML = '';
+
+      let filtered = reportsData;
+      if (filter !== 'all') filtered = reportsData.filter(r => r.status === filter);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400 text-sm">لا توجد تقارير مطابقة حالياً.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(r => {
+        let badge = r.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : (r.status === 'absent' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800');
+        let txt = r.status === 'completed' ? 'تم الإنجاز 🟢' : (r.status === 'absent' ? 'لم تدرس 🔴' : 'تأخر 🟠');
+        
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 border-b border-slate-100 text-xs md:text-sm">
+            <td class="p-4 text-slate-500">${new Date(r.timestamp).toLocaleString('ar-DZ')}</td>
+            <td class="p-4 font-bold text-slate-800">${r.subject}</td>
+            <td class="p-4 text-slate-700">${r.teacher}</td>
+            <td class="p-4 text-slate-600">${groupsMap[r.groupId] || r.groupId}</td>
+            <td class="p-4"><span class="${badge} px-2.5 py-1 rounded-full font-bold text-xs">${txt}</span></td>
+            <td class="p-4 text-slate-600">${r.delegateName} <span class="text-slate-400 block text-[11px] italic">${r.notes ? 'ملاحظة: ' + r.notes : ''}</span></td>
+          </tr>
+        `;
+      });
+    }
+
+    function printOfficialReport() {
+      const nowStr = new Date().toLocaleString('ar-DZ', { dateStyle: 'full', timeStyle: 'short' });
+      document.getElementById('printDate').textContent = `تاريخ استخراج التقرير: ${nowStr}`;
+      window.print();
+    }
+
+    function logoutAdmin() {
+      document.getElementById('adminPassword').value = '';
+      document.getElementById('appSection').classList.add('hidden');
+      document.getElementById('loginSection').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

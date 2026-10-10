@@ -294,6 +294,30 @@
   ],
   "reports": [
     {
+      "id": "rep_1791656878858",
+      "groupId": "L1-G01",
+      "scheduleId": "s_1",
+      "subject": "علوم القرآن (محاضرة)",
+      "teacher": "أ. بن عبد الله",
+      "time": "08:00 - 09:30",
+      "status": "absent",
+      "notes": "",
+      "delegateName": "ممثل الفوج",
+      "timestamp": "2026-10-10T18:27:58.858Z"
+    },
+    {
+      "id": "rep_1791656873460",
+      "groupId": "L1-G01",
+      "scheduleId": "s_1",
+      "subject": "علوم القرآن (محاضرة)",
+      "teacher": "أ. بن عبد الله",
+      "time": "08:00 - 09:30",
+      "status": "completed",
+      "notes": "",
+      "delegateName": "ممثل الفوج",
+      "timestamp": "2026-10-10T18:27:53.463Z"
+    },
+    {
       "id": "rep_1791639279646",
       "groupId": "L1-G01",
       "scheduleId": "sch_1791639250462",

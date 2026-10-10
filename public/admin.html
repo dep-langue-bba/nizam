@@ -7,98 +7,91 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css">
   <style>
-    body { font-family: 'Cairo', sans-serif; }
-
-    /* تنسيقات خاصة بالطباعة الرسمية للتقارير */
     @media print {
-      body {
-        background-color: white !important;
-        color: #000 !important;
-      }
-      header, #loginSection, .no-print, button, select, .print-hide {
-        display: none !important;
-      }
-      /* إظهار ترويسة الطباعة الرسمية */
-      .official-print-header {
-        display: block !important;
-        text-align: center;
-        margin-bottom: 25px;
-        border-bottom: 2px solid #111;
-        padding-bottom: 15px;
-      }
-      main {
-        padding: 0 !important;
-        margin: 0 !important;
-      }
-      .print-container {
-        box-shadow: none !important;
-        border: none !important;
-        padding: 0 !important;
-      }
-      table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-      }
-      th, td {
-        border: 1px solid #333 !important;
-        padding: 8px !important;
-        font-size: 11px !important;
-        color: #000 !important;
-        text-align: right !important;
-      }
-      th {
-        background-color: #f1f5f9 !important;
-      }
+      body { background-color: white !important; color: #000 !important; }
+      header, #loginSection, .no-print, button, select, .print-hide { display: none !important; }
+      .official-print-header { display: block !important; text-align: center; margin-bottom: 25px; border-bottom: 2px solid #111; padding-bottom: 15px; }
+      main { padding: 0 !important; margin: 0 !important; }
+      .print-container { box-shadow: none !important; border: none !important; padding: 0 !important; }
+      table { width: 100% !important; border-collapse: collapse !important; }
+      th, td { border: 1px solid #333 !important; padding: 8px !important; font-size: 11px !important; color: #000 !important; text-align: right !important; }
+      th { background-color: #f1f5f9 !important; }
     }
-    .official-print-header {
-      display: none;
-    }
+    .official-print-header { display: none; }
   </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { cairo: ['Cairo', 'sans-serif'] },
+          colors: {
+            forest: { DEFAULT: '#0c5e2a', dark: '#083f1c', light: '#13873f', muted: '#e8f3ec' },
+            gold: { DEFAULT: '#dfab00', dark: '#b38800', light: '#f5c518', muted: '#fcf8e8' }
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col">
+<body class="bg-subtle min-h-screen text-slate-800 flex flex-col antialiased">
 
   <!-- شاشة الدخول للإدارة -->
-  <div id="loginSection" class="max-w-md w-full mx-auto mt-24 bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
-    <div class="text-center mb-6">
-      <h2 class="text-3xl font-black text-slate-900 mb-1">نِظَام</h2>
-      <p class="text-xs text-amber-600 font-bold tracking-widest uppercase">بوابة الإدارة المركزية</p>
-    </div>
-    <div class="space-y-4">
-      <input type="password" id="adminPassword" placeholder="أدخل كلمة مرور الإدارة..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-center text-sm focus:ring-2 focus:ring-amber-500 outline-none">
-      <button onclick="loginAdmin()" class="w-full bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold py-3 rounded-xl transition shadow-md text-sm">
-        تسجيل الدخول للإدارة
-      </button>
-      <p id="adminError" class="text-rose-600 text-xs text-center hidden font-semibold"></p>
+  <div id="loginSection" class="max-w-md w-full mx-auto my-auto px-4 py-8">
+    <div class="glass-card bg-white/95 p-6 sm:p-8 rounded-3xl border-2 border-slate-200/80 shadow-xl space-y-5">
+      <div class="text-center">
+        <span class="bg-[#0c5e2a] text-[#dfab00] px-4 py-1.5 rounded-2xl font-black text-2xl shadow-sm inline-block mb-2">نِظَـام</span>
+        <p class="text-xs text-[#0c5e2a] font-bold tracking-widest uppercase">بوابة الإدارة المركزية</p>
+      </div>
+      <div class="space-y-3">
+        <input type="password" id="adminPassword" placeholder="أدخل كلمة مرور الإدارة..." class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl p-3.5 text-center text-sm font-bold focus:border-[#0c5e2a] outline-none">
+        <button onclick="loginAdmin()" class="w-full bg-[#0c5e2a] hover:bg-[#083f1c] text-[#dfab00] font-bold py-3.5 rounded-2xl transition shadow-md text-sm">
+          تسجيل الدخول للإدارة
+        </button>
+        <p id="adminError" class="text-rose-600 text-xs text-center hidden font-bold"></p>
+      </div>
     </div>
   </div>
 
-  <!-- لوحة القيادة الذكية (مخفية حتى تسجيل الدخول) -->
+  <!-- لوحة القيادة الذكية (تنسيق مرن ومتجاوب للهواتف) -->
   <main id="appSection" class="hidden flex-1 flex flex-col">
     
-    <!-- الشريط العلوي -->
-    <header class="bg-slate-900 text-white shadow-md border-b border-amber-500/30 sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <span class="bg-amber-500 text-slate-950 font-black text-lg px-3 py-1 rounded-lg">نِظَام</span>
-        <div>
-          <h1 class="font-bold text-base leading-tight">قسم اللغة والأدب العربي</h1>
-          <p class="text-[11px] text-slate-400">جامعة محمد البشير الإبراهيمي</p>
-        </div>
+    <!-- الشريط العلوي المرن والأنيق -->
+    <header class="glass-header sticky top-0 z-50 shadow-sm border-b border-slate-200">
+      <div class="bg-[#0c5e2a] text-white py-1 px-4 text-center">
+        <p class="text-[10px] sm:text-xs font-bold tracking-wide text-amber-200">
+          الجمهورية الجزائرية الديمقراطية الشعبية — وزارة التعليم العالي والبحث العلمي
+        </p>
       </div>
-      <div class="flex items-center gap-3">
-        <button onclick="printOfficialReport()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition shadow-sm">
-          🖨️ طباعة التقرير الرسمي
-        </button>
-        <button onclick="fetchData()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition">
-          🔄 تحديث البيانات
-        </button>
-        <button onclick="logoutAdmin()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">خروج</button>
+
+      <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+          <div class="flex items-center gap-2">
+            <span class="bg-[#0c5e2a] text-[#dfab00] font-black text-base px-3 py-1 rounded-xl">نِظَـام</span>
+            <div>
+              <h1 class="font-extrabold text-xs sm:text-sm text-[#0c5e2a] leading-tight">قسم اللغة والأدب العربي</h1>
+              <p class="text-[10px] text-slate-500 font-semibold">جامعة محمد البشير الإبراهيمي</p>
+            </div>
+          </div>
+          <button onclick="logoutAdmin()" class="sm:hidden text-xs text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg font-bold border border-rose-100">خروج</button>
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button onclick="printOfficialReport()" class="bg-[#dfab00] hover:bg-[#b38800] text-slate-950 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow-sm transition">
+            🖨️ طباعة التقرير
+          </button>
+          <button onclick="fetchData()" class="bg-emerald-50 hover:bg-emerald-100 text-[#0c5e2a] border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold transition">
+            🔄 تحديث
+          </button>
+          <button onclick="logoutAdmin()" class="hidden sm:block bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">خروج</button>
+        </div>
       </div>
     </header>
 
     <div class="max-w-7xl w-full mx-auto px-4 py-6 space-y-6 flex-1">
       
-      <!-- ترويسة الطباعة الرسمية (تظهر حصرياً عند الطباعة أو التصدير) -->
+      <!-- ترويسة الطباعة الرسمية -->
       <div class="official-print-header">
         <p class="text-xs font-bold mb-1">الجمهورية الجزائرية الديمقراطية الشعبية — وزارة التعليم العالي والبحث العلمي</p>
         <h2 class="text-sm font-bold mb-0.5">جامعة محمد البشير الإبراهيمي — برج بوعريريج</h2>
@@ -108,88 +101,86 @@
       </div>
 
       <!-- قسم الحصص الجارية الآن (Live Now) -->
-      <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl p-6 shadow-lg border border-amber-500/30 print-hide">
-        <div class="flex justify-between items-center mb-4">
+      <div class="bg-gradient-to-r from-[#0c5e2a] to-[#083f1c] text-white rounded-3xl p-5 shadow-lg border border-amber-400/30 print-hide space-y-3">
+        <div class="flex flex-wrap justify-between items-center gap-2">
           <div class="flex items-center gap-2">
-            <span class="w-3 h-3 bg-emerald-500 rounded-full animate-ping"></span>
-            <h2 class="font-bold text-amber-400 text-base">الحصص التي تُقدم الآن في القسم (متابعة حية)</h2>
+            <span class="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
+            <h2 class="font-bold text-[#dfab00] text-sm sm:text-base">الحصص التي تُقدم الآن (متابعة حية)</h2>
           </div>
-          <span id="currentTimeDisplay" class="text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700"></span>
+          <span id="currentTimeDisplay" class="text-[11px] bg-black/30 text-emerald-100 px-2.5 py-1 rounded-full border border-white/10"></span>
         </div>
-        <div id="liveNowContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <!-- يتم تعبئتها برمجياً -->
+        <div id="liveNowContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+      </div>
+
+      <!-- بطاقات الإحصائيات السريعة (خياران فقط: تم الإنجاز / لم تنجز) -->
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 print-hide">
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+          <p class="text-xs font-semibold text-slate-500">إجمالي التقارير</p>
+          <h3 id="statTotal" class="text-2xl sm:text-3xl font-black text-slate-800 mt-1">0</h3>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-emerald-200 bg-emerald-50/30">
+          <p class="text-xs font-bold text-[#0c5e2a]">حصص تم إنجازها</p>
+          <h3 id="statCompleted" class="text-2xl sm:text-3xl font-black text-emerald-700 mt-1">0</h3>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-rose-200 bg-rose-50/30 col-span-2 sm:col-span-1">
+          <p class="text-xs font-bold text-rose-600">غيابات / لم تُدرس</p>
+          <h3 id="statAbsent" class="text-2xl sm:text-3xl font-black text-rose-700 mt-1">0</h3>
         </div>
       </div>
 
-      <!-- بطاقات الإحصائيات السريعة -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 print-hide">
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-          <p class="text-xs font-semibold text-slate-500">إجمالي التقارير المستلمة</p>
-          <h3 id="statTotal" class="text-3xl font-extrabold text-slate-800 mt-2">0</h3>
-        </div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-emerald-100 bg-emerald-50/20">
-          <p class="text-xs font-semibold text-emerald-600">حصص تم إنجازها</p>
-          <h3 id="statCompleted" class="text-3xl font-extrabold text-emerald-700 mt-2">0</h3>
-        </div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-rose-100 bg-rose-50/20">
-          <p class="text-xs font-semibold text-rose-600">غيابات / لم تُدرس</p>
-          <h3 id="statAbsent" class="text-3xl font-extrabold text-rose-700 mt-2">0</h3>
-        </div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-amber-100 bg-amber-50/20">
-          <p class="text-xs font-semibold text-amber-600">تأخر / تغطية خاصة</p>
-          <h3 id="statDelayed" class="text-3xl font-extrabold text-amber-700 mt-2">0</h3>
-        </div>
-      </div>
-
-      <!-- قسم الرسوم البيانية التفاعلية -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 print-hide">
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 md:col-span-2 flex flex-col justify-center">
-          <h3 class="font-bold text-slate-800 text-sm mb-3">توزيع حالات الحصص في القسم</h3>
-          <div class="h-48 flex justify-center">
+      <!-- قسم الرسم البياني -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 print-hide">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 md:col-span-2">
+          <h3 class="font-bold text-slate-800 text-xs sm:text-sm mb-3">توزيع نسبة إنجاز الحصص</h3>
+          <div class="h-44 flex justify-center">
             <canvas id="statusChart"></canvas>
           </div>
         </div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between text-center">
           <div>
-            <h3 class="font-bold text-slate-800 text-sm mb-1">مؤشر الانضباط العام</h3>
-            <p class="text-xs text-slate-400">نسبة الحصص المنجزة مقارنة بالغيابات</p>
+            <h3 class="font-bold text-slate-800 text-xs sm:text-sm mb-1">مؤشر الانضباط العام</h3>
+            <p class="text-[11px] text-slate-400">نسبة التغطية البيداغوجية الفعالة</p>
           </div>
-          <div class="text-center py-4">
-            <span id="complianceRate" class="text-4xl font-black text-emerald-600">100%</span>
-            <span class="block text-xs text-slate-500 mt-1">معدل الالتزام التعليمي</span>
+          <div class="py-3">
+            <span id="complianceRate" class="text-3xl sm:text-4xl font-black text-[#0c5e2a]">100%</span>
+            <span class="block text-xs text-slate-500 mt-1">معدل الالتزام</span>
           </div>
-          <div class="text-[11px] text-slate-400 bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-center">
-            تُحسب البيانات لحظياً بناءً على تقارير ممثلي الأفواج.
+          <div class="text-[10px] text-slate-400 bg-slate-50 p-2 rounded-xl border">
+            بيانات لحظية موثقة من الأفواج.
           </div>
         </div>
       </div>
 
-      <!-- جدول السجل الكامل للتقارير -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden print-container">
-        <div class="p-5 border-b border-slate-100 flex justify-between items-center print-hide">
-          <h3 class="font-bold text-slate-800 text-base">سجل التقارير اليومية المباشر</h3>
-          <select id="statusFilter" onchange="renderReportsTable()" class="bg-slate-50 border border-slate-300 rounded-lg text-xs p-2 outline-none">
-            <option value="all">جميع الحالات</option>
-            <option value="completed">الإنجاز فقط</option>
-            <option value="absent">الغيابات فقط</option>
-            <option value="delayed">التأخر فقط</option>
+      <!-- السجل المباشر للتقارير (عرض متجاوب للهواتف) -->
+      <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden print-container">
+        <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-2 print-hide">
+          <h3 class="font-bold text-slate-900 text-sm sm:text-base">سجل التقارير اليومية المباشر</h3>
+          <select id="statusFilter" onchange="renderReportsTable()" class="bg-slate-50 border border-slate-300 rounded-xl text-xs p-2 outline-none font-bold">
+            <option value="all">جميع التقارير</option>
+            <option value="completed">تم الإنجاز فقط 🟢</option>
+            <option value="absent">لم تنجز فقط 🔴</option>
           </select>
         </div>
-        <div class="overflow-x-auto">
+
+        <!-- العرض الجدولي (للشاشات الكبيرة والطباعة) -->
+        <div class="hidden sm:block overflow-x-auto">
           <table class="w-full text-right text-sm">
-            <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 text-xs">
+            <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200 text-xs">
               <tr>
                 <th class="p-4">التوقيت والتاريخ</th>
                 <th class="p-4">المقياس</th>
                 <th class="p-4">الأستاذ</th>
                 <th class="p-4">الفوج</th>
                 <th class="p-4">حالة الحصة</th>
-                <th class="p-4">ملاحظات وموثق التقرير</th>
+                <th class="p-4">الملاحظات والموثق</th>
               </tr>
             </thead>
             <tbody id="reportsTableBody" class="divide-y divide-slate-100"></tbody>
           </table>
         </div>
+
+        <!-- العرض المتجاوب على هيئة بطاقات مقروءة بوضوح (للهواتف المحمولة) -->
+        <div id="reportsMobileCards" class="block sm:hidden divide-y divide-slate-100 p-3 space-y-3"></div>
       </div>
 
     </div>
@@ -228,7 +219,7 @@
           errorEl.classList.remove('hidden');
         }
       } catch (e) {
-        errorEl.textContent = 'خطأ في الاتصال بالسيرفر';
+        errorEl.textContent = 'خطأ في الاتصال بالخادم';
         errorEl.classList.remove('hidden');
       }
     }
@@ -243,7 +234,7 @@
         renderLiveNow();
         renderReportsTable();
       } catch (e) {
-        console.error('خطأ في جلب التقارير');
+        console.error('خطأ في جلب البيانات');
       }
     }
 
@@ -251,14 +242,12 @@
       const total = reportsData.length;
       const completed = reportsData.filter(r => r.status === 'completed').length;
       const absent = reportsData.filter(r => r.status === 'absent').length;
-      const delayed = reportsData.filter(r => r.status === 'delayed').length;
 
       document.getElementById('statTotal').textContent = total;
       document.getElementById('statCompleted').textContent = completed;
       document.getElementById('statAbsent').textContent = absent;
-      document.getElementById('statDelayed').textContent = delayed;
 
-      if(total > 0) {
+      if (total > 0) {
         const rate = Math.round((completed / total) * 100);
         document.getElementById('complianceRate').textContent = rate + '%';
       }
@@ -267,7 +256,6 @@
     function renderChart() {
       const completed = reportsData.filter(r => r.status === 'completed').length;
       const absent = reportsData.filter(r => r.status === 'absent').length;
-      const delayed = reportsData.filter(r => r.status === 'delayed').length;
 
       const ctx = document.getElementById('statusChart').getContext('2d');
       if (myChart) myChart.destroy();
@@ -275,10 +263,10 @@
       myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['تم الإنجاز', 'غياب / لم تدرس', 'تأخر أو تغييز'],
+          labels: ['تم الإنجاز', 'لم تنجز (غياب)'],
           datasets: [{
-            data: [completed, absent, delayed],
-            backgroundColor: ['#059669', '#E11D48', '#D97706'],
+            data: [completed, absent],
+            backgroundColor: ['#0c5e2a', '#e11d48'],
             borderWidth: 0
           }]
         },
@@ -286,7 +274,7 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'bottom', labels: { font: { family: 'Cairo', size: 12 } } }
+            legend: { position: 'bottom', labels: { font: { family: 'Cairo', size: 11 } } }
           }
         }
       });
@@ -299,24 +287,24 @@
       const now = new Date();
       const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
       const currentDay = days[now.getDay()];
-      document.getElementById('currentTimeDisplay').textContent = `اليوم: ${currentDay} | الساعة: ${now.toLocaleTimeString('ar-DZ', {hour: '2-digit', minute:'2-digit'})}`;
+      document.getElementById('currentTimeDisplay').textContent = `${currentDay} | ${now.toLocaleTimeString('ar-DZ', {hour: '2-digit', minute:'2-digit'})}`;
 
       const todaySchedules = allSchedules.filter(s => s.day === currentDay);
 
       if (todaySchedules.length === 0) {
-        container.innerHTML = '<p class="text-xs text-slate-400 col-span-3 text-center py-4">لا توجد حصص مجدولة مسجلة لهذا اليوم حالياً.</p>';
+        container.innerHTML = '<p class="text-xs text-slate-300 col-span-full text-center py-2">لا توجد حصص مجدولة مسجلة لهذا اليوم حالياً.</p>';
         return;
       }
 
       todaySchedules.slice(0, 3).forEach(s => {
         container.innerHTML += `
-          <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 text-xs space-y-1">
-            <div class="flex justify-between font-bold text-amber-400">
+          <div class="bg-black/20 border border-white/10 rounded-xl p-3 text-xs space-y-1">
+            <div class="flex justify-between font-bold text-[#dfab00]">
               <span>${s.subject}</span>
               <span>${s.time}</span>
             </div>
-            <p class="text-slate-300">الأستاذ: ${s.teacher}</p>
-            <p class="text-slate-400 text-[11px]">الفوج: ${groupsMap[s.groupId] || s.groupId} | المكان: ${s.room}</p>
+            <p class="text-slate-200">الأستاذ: ${s.teacher}</p>
+            <p class="text-slate-300 text-[11px]">الفوج: ${groupsMap[s.groupId] || s.groupId} | القاعة: ${s.room}</p>
           </div>
         `;
       });
@@ -324,30 +312,58 @@
 
     function renderReportsTable() {
       const tbody = document.getElementById('reportsTableBody');
+      const mobileContainer = document.getElementById('reportsMobileCards');
       const filter = document.getElementById('statusFilter').value;
+      
       tbody.innerHTML = '';
+      mobileContainer.innerHTML = '';
 
       let filtered = reportsData;
       if (filter !== 'all') filtered = reportsData.filter(r => r.status === filter);
 
       if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400 text-sm">لا توجد تقارير مطابقة حالياً.</td></tr>`;
+        mobileContainer.innerHTML = `<p class="text-center py-6 text-slate-400 text-xs">لا توجد تقارير مطابقة حالياً.</p>`;
         return;
       }
 
       filtered.forEach(r => {
-        let badge = r.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : (r.status === 'absent' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800');
-        let txt = r.status === 'completed' ? 'تم الإنجاز 🟢' : (r.status === 'absent' ? 'لم تدرس 🔴' : 'تأخر 🟠');
-        
+        const isCompleted = r.status === 'completed';
+        const badge = isCompleted ? 'bg-emerald-100 text-[#0c5e2a]' : 'bg-rose-100 text-rose-800';
+        const txt = isCompleted ? 'تم الإنجاز 🟢' : 'لم تنجز 🔴';
+        const dateStr = new Date(r.timestamp).toLocaleString('ar-DZ', { dateStyle: 'short', timeStyle: 'short' });
+
+        // إضافة صف السجل للكمبيوتر
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 border-b border-slate-100 text-xs md:text-sm">
-            <td class="p-4 text-slate-500">${new Date(r.timestamp).toLocaleString('ar-DZ')}</td>
-            <td class="p-4 font-bold text-slate-800">${r.subject}</td>
+            <td class="p-4 text-slate-500">${dateStr}</td>
+            <td class="p-4 font-bold text-slate-900">${r.subject}</td>
             <td class="p-4 text-slate-700">${r.teacher}</td>
             <td class="p-4 text-slate-600">${groupsMap[r.groupId] || r.groupId}</td>
             <td class="p-4"><span class="${badge} px-2.5 py-1 rounded-full font-bold text-xs">${txt}</span></td>
             <td class="p-4 text-slate-600">${r.delegateName} <span class="text-slate-400 block text-[11px] italic">${r.notes ? 'ملاحظة: ' + r.notes : ''}</span></td>
           </tr>
+        `;
+
+        // إضافة بطاقة متجاوبة ومقروءة للهاتف المحمول
+        mobileContainer.innerHTML += `
+          <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-xs space-y-2">
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm">${r.subject}</h4>
+                <p class="text-slate-600 font-semibold text-[11px] mt-0.5">الأستاذ: ${r.teacher}</p>
+              </div>
+              <span class="${badge} px-2 py-0.5 rounded-lg font-bold text-[11px]">${txt}</span>
+            </div>
+            <div class="flex justify-between text-slate-500 text-[11px] pt-1 border-t border-slate-200/60">
+              <span>الفوج: <strong>${groupsMap[r.groupId] || r.groupId}</strong></span>
+              <span>${dateStr}</span>
+            </div>
+            <div class="text-[11px] text-slate-500">
+              الموثق: <strong class="text-slate-700">${r.delegateName}</strong>
+              ${r.notes ? `<span class="block text-slate-400 italic mt-0.5">ملاحظة: ${r.notes}</span>` : ''}
+            </div>
+          </div>
         `;
       });
     }

@@ -3,87 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نِظَام - بوابة ممثل الفوج الذكية</title>
+  <title>نِظَام - بوابة ممثلي الأفواج</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style> body { font-family: 'Cairo', sans-serif; } </style>
+  <link rel="stylesheet" href="./css/styles.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { cairo: ['Cairo', 'sans-serif'] },
+          colors: {
+            forest: { DEFAULT: '#0c5e2a', dark: '#083f1c', light: '#13873f', muted: '#e8f3ec' },
+            gold: { DEFAULT: '#dfab00', dark: '#b38800', light: '#f5c518', muted: '#fcf8e8' }
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body class="bg-slate-100 min-h-screen p-4 text-slate-800">
+<body class="bg-subtle min-h-screen text-slate-800 flex flex-col antialiased">
 
-  <!-- شاشة تسجيل الدخول برمز PIN -->
-  <div id="loginSection" class="max-w-md mx-auto mt-16 bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-    <div class="text-center mb-6">
-      <h1 class="text-3xl font-black text-amber-500 mb-1">نِظَام</h1>
-      <p class="text-sm text-slate-500">منصة المتابعة الذكية - ممثلو الأفواج</p>
+  <!-- الشريط العلوي الشفاف والسيادي بالهوية الجديدة -->
+  <header class="glass-header sticky top-0 z-50 shadow-sm">
+    <div class="bg-[#0c5e2a] text-white py-1.5 px-4 text-center">
+      <p class="text-[10px] sm:text-xs font-bold tracking-wide text-amber-200">
+        الجمهورية الجزائرية الديمقراطية الشعبية — وزارة التعليم العالي والبحث العلمي
+      </p>
     </div>
-    <div class="space-y-4">
-      <div>
-        <label class="block text-sm font-semibold mb-2">اختر الفوج الخاص بك:</label>
-        <select id="groupSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
-          <option value="">-- جارِ تحميل الأفواج --</option>
-        </select>
+    <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="bg-[#0c5e2a] text-[#dfab00] px-3 py-1 rounded-xl font-black text-lg shadow-sm">نِظَـام</div>
+        <div>
+          <h1 class="font-bold text-xs sm:text-sm text-[#0c5e2a] leading-tight">بوابة ممثلي الأفواج</h1>
+          <p class="text-[10px] text-slate-500 font-semibold">قسم اللغة والأدب العربي · جامعة برج بوعريريج</p>
+        </div>
       </div>
-      <div>
-        <label class="block text-sm font-semibold mb-2">رمز الدخول (PIN):</label>
-        <input type="password" id="pinInput" placeholder="أدخل رمز الفوج..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-sm text-center tracking-widest focus:ring-2 focus:ring-amber-500 outline-none">
-      </div>
-      <button onclick="login()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-lg transition shadow-md">
-        دخول للبوابة
-      </button>
-      <p id="loginError" class="text-rose-600 text-xs text-center hidden"></p>
+      <a href="index.html" class="text-xs font-bold text-[#0c5e2a] bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition">
+        ← العودة للرئيسية
+      </a>
     </div>
-  </div>
+  </header>
 
-  <!-- لوحة تفاعل ممثل الفوج (مخفية حتى الدخول) -->
-  <main id="appSection" class="max-w-2xl mx-auto space-y-6 hidden">
-    
-    <!-- الهيدر -->
-    <header class="bg-slate-900 text-white rounded-2xl p-5 shadow-lg flex justify-between items-center">
-      <div>
-        <h2 id="groupNameDisplay" class="text-lg font-bold text-amber-400"></h2>
-        <p class="text-xs text-slate-300 mt-0.5">اختر اليوم وسجل حضور الحصص أو أضفها لجدولك الثابت</p>
+  <!-- محتوى الصفحة -->
+  <main class="max-w-2xl w-full mx-auto p-4 flex-1 my-6">
+
+    <!-- شاشة تسجيل الدخول بررمز PIN -->
+    <div id="loginSection" class="glass-card bg-white/95 p-6 sm:p-8 rounded-3xl border-2 border-slate-200/80 shadow-md">
+      <div class="text-center mb-6 border-b pb-4 border-slate-100">
+        <h2 class="text-xl font-bold text-slate-900">تسجيل دخول ممثل الفوج</h2>
+        <p class="text-l text-slate-500 mt-1">اختر الفوج وأدخِل رمز الـ PIN الخاص بك للوصول إلى الجدول</p>
       </div>
-      <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-2 rounded-lg font-semibold transition">خروج</button>
-    </header>
-
-    <!-- اسم الموثق -->
-    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-      <label class="block text-xs font-semibold mb-1 text-slate-600">اسم ممثل الفوج (للتوثيق):</label>
-      <input type="text" id="delegateName" placeholder="أدخل اسمك الكريم..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm outline-none focus:border-amber-500">
-    </div>
-
-    <!-- أزرار اختيار الأيام -->
-    <div class="flex gap-2 overflow-x-auto pb-2" id="daysContainer">
-      <button onclick="selectDay('السبت')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-50 transition active">السبت</button>
-      <button onclick="selectDay('الأحد')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-50 transition">الأحد</button>
-      <button onclick="selectDay('الإثنين')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-50 transition">الإثنين</button>
-      <button onclick="selectDay('الثلاثاء')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-50 transition">الثلاثاء</button>
-      <button onclick="selectDay('الأربعاء')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-50 transition">الأربعاء</button>
-      <button onclick="selectDay('الخميس')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-50 transition">الخميس</button>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">اختر الفوج الخاص بك:</label>
+          <select id="groupSelect" class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-sm font-bold text-slate-800 focus:border-[#0c5e2a] outline-none transition">
+            <option value="">-- جارِ تحميل الأفواج --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">رمز الدخول (PIN):</label>
+          <input type="password" id="pinInput" placeholder="احصل على رمز فوجك من الإدارة" class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-center text-sm font-bold tracking-widest focus:border-[#0c5e2a] outline-none transition">
+        </div>
+        <button onclick="login()" class="w-full bg-[#0c5e2a] hover:bg-[#083f1c] text-[#dfab00] font-bold py-3.5 rounded-2xl shadow-md transition text-sm">
+          دخول للبوابة
+        </button>
+        <p id="loginError" class="text-rose-600 text-xs text-center hidden font-semibold"></p>
+      </div>
     </div>
 
-    <!-- عرض الحصص الخاصة باليوم المختار -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
-      <div class="flex justify-between items-center border-b pb-3 border-slate-100">
-        <h3 id="currentDayTitle" class="font-bold text-slate-800 text-base">حصص يوم: السبت</h3>
-        <button onclick="openAddModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs px-3 py-2 rounded-lg font-bold transition shadow-sm">+ إضافة حصة ثابتة</button>
+    <!-- لوحة تفاعل ممثل الفوج (مخفية حتى الدخول) -->
+    <div id="appSection" class="space-y-6 hidden">
+      
+      <!-- ترويسة الفوج الحالي -->
+      <div class="glass-card bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
+        <div>
+          <span class="text-[10px] bg-emerald-100 text-[#0c5e2a] font-bold px-2.5 py-1 rounded-full border border-emerald-200">الفوج النشط</span>
+          <h2 id="groupNameDisplay" class="text-lg font-bold text-slate-900 mt-1"></h2>
+        </div>
+        <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-2 rounded-xl font-semibold transition shadow-sm">خروج</button>
       </div>
 
-      <div id="dayScheduleList" class="space-y-3">
-        <!-- يتم تعبئتها ديناميكياً -->
+      <!-- اسم الموثق -->
+      <div class="glass-card bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <label class="block text-xs font-bold text-slate-700 mb-1">اسم ممثل الفوج (للتوثيق الرسمي):</label>
+        <input type="text" id="delegateName" placeholder="أدخل اسمك الكريم..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm outline-none focus:border-[#0c5e2a]">
       </div>
+
+      <!-- أزرار اختيار الأيام -->
+      <div class="flex gap-2 overflow-x-auto pb-2">
+        <button onclick="selectDay('السبت')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-emerald-50 transition active">السبت</button>
+        <button onclick="selectDay('الأحد')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-emerald-50 transition">الأحد</button>
+        <button onclick="selectDay('الإثنين')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-emerald-50 transition">الإثنين</button>
+        <button onclick="selectDay('الثلاثاء')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-emerald-50 transition">الثلاثاء</button>
+        <button onclick="selectDay('الأربعاء')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-emerald-50 transition">الأربعاء</button>
+        <button onclick="selectDay('الخميس')" class="day-btn bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-emerald-50 transition">الخميس</button>
+      </div>
+
+      <!-- عرض الحصص الخاصة باليوم المختار -->
+      <div class="glass-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+        <div class="flex justify-between items-center border-b pb-3 border-slate-100">
+          <h3 id="currentDayTitle" class="font-bold text-slate-800 text-base">حصص يوم: السبت</h3>
+          <button onclick="openAddModal()" class="bg-[#dfab00] hover:bg-[#b38800] text-slate-950 text-xs px-3 py-2 rounded-xl font-bold transition shadow-sm">+ إضافة حصة للجدول</button>
+        </div>
+
+        <div id="dayScheduleList" class="space-y-3"></div>
+      </div>
+
     </div>
 
   </main>
 
-  <!-- نافذة منبثقة (Modal) لإضافة حصة جديدة للجدول الثابت -->
-  <div id="addModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+  <!-- نافذة منبثقة لإضافة حصة -->
+  <div id="addModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
-      <h3 class="font-bold text-slate-900 text-lg border-b pb-2">إضافة حصة للجدول الثابت</h3>
+      <h3 class="font-bold text-slate-900 text-lg border-b pb-2">إضافة حصة ثابتة للجدول</h3>
       
       <div>
-        <label class="block text-xs font-semibold mb-1">التوقيت الزمني:</label>
-        <select id="modalTime" class="w-full bg-slate-50 border rounded-lg p-2.5 text-sm outline-none">
+        <label class="block text-xs font-bold mb-1">التوقيت الزمني:</label>
+        <select id="modalTime" class="w-full bg-slate-50 border rounded-xl p-2.5 text-sm outline-none">
           <option value="08:00 - 09:30">08:00 - 09:30</option>
           <option value="09:35 - 11:05">09:35 - 11:05</option>
           <option value="11:10 - 12:40">11:10 - 12:40</option>
@@ -93,23 +130,23 @@
       </div>
 
       <div>
-        <label class="block text-xs font-semibold mb-1">اسم المقياس:</label>
-        <input type="text" id="modalSubject" placeholder="مثال: اللسانيات الحاسوبية..." class="w-full bg-slate-50 border rounded-lg p-2.5 text-sm outline-none">
+        <label class="block text-xs font-bold mb-1">اسم المقياس:</label>
+        <input type="text" id="modalSubject" placeholder="مثال: اللسانيات ..." class="w-full bg-slate-50 border rounded-xl p-2.5 text-sm outline-none">
       </div>
 
       <div>
-        <label class="block text-xs font-semibold mb-1">اسم الأستاذ:</label>
-        <input type="text" id="modalTeacher" placeholder="مثال: د. بلميهوب..." class="w-full bg-slate-50 border rounded-lg p-2.5 text-sm outline-none">
+        <label class="block text-xs font-bold mb-1">اسم الأستاذ:</label>
+        <input type="text" id="modalTeacher" placeholder="مثال: د. بلميهوب..." class="w-full bg-slate-50 border rounded-xl p-2.5 text-sm outline-none">
       </div>
 
       <div>
-        <label class="block text-xs font-semibold mb-1">القاعة / المدرج:</label>
-        <input type="text" id="modalRoom" placeholder="مثال: قاعة 12 أو المدرج 02..." class="w-full bg-slate-50 border rounded-lg p-2.5 text-sm outline-none">
+        <label class="block text-xs font-bold mb-1">القاعة / المدرج:</label>
+        <input type="text" id="modalRoom" placeholder="مثال: قاعة 12..." class="w-full bg-slate-50 border rounded-xl p-2.5 text-sm outline-none">
       </div>
 
       <div class="flex gap-2 pt-2">
-        <button onclick="saveNewSchedule()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm transition">حفظ في الجدول</button>
-        <button onclick="closeAddModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2.5 rounded-lg text-sm transition">إلغاء</button>
+        <button onclick="saveNewSchedule()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-sm transition">حفظ</button>
+        <button onclick="closeAddModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-sm transition">إلغاء</button>
       </div>
     </div>
   </div>
@@ -120,13 +157,19 @@
     let selectedDay = 'السبت';
 
     async function loadGroups() {
-      const res = await fetch('/api/init');
-      const data = await res.json();
-      const select = document.getElementById('groupSelect');
-      select.innerHTML = '<option value="">-- اختر الفوج --</option>';
-      data.groups.forEach(g => {
-        select.innerHTML += `<option value="${g.id}">${g.name}</option>`;
-      });
+      try {
+        const res = await fetch('/api/init');
+        const data = await res.json();
+        const select = document.getElementById('groupSelect');
+        select.innerHTML = '<option value="">-- اختر الفوج --</option>';
+        if (data.groups) {
+          data.groups.forEach(g => {
+            select.innerHTML += `<option value="${g.id}">${g.name}</option>`;
+          });
+        }
+      } catch (e) {
+        console.error('خطأ في تحميل الأفواج');
+      }
     }
 
     async function login() {
@@ -134,6 +177,8 @@
       const pin = document.getElementById('pinInput').value;
       const errorEl = document.getElementById('loginError');
       
+      errorEl.classList.add('hidden');
+
       if (!groupId || !pin) {
         errorEl.textContent = 'يرجى اختيار الفوج ووضع الرمز السري.';
         errorEl.classList.remove('hidden');
@@ -156,7 +201,7 @@
           document.getElementById('groupNameDisplay').textContent = currentGroup.name;
           renderDaySchedule();
         } else {
-          errorEl.textContent = data.error;
+          errorEl.textContent = data.error || 'رمز الـ PIN غير صحيح';
           errorEl.classList.remove('hidden');
         }
       } catch (e) {
@@ -169,10 +214,10 @@
       selectedDay = day;
       document.querySelectorAll('.day-btn').forEach(btn => {
         if(btn.textContent.includes(day)) {
-          btn.classList.add('bg-amber-500', 'text-slate-950', 'border-amber-500');
+          btn.classList.add('bg-[#dfab00]', 'text-slate-950', 'border-[#dfab00]');
           btn.classList.remove('bg-white', 'text-slate-700');
         } else {
-          btn.classList.remove('bg-amber-500', 'text-slate-950', 'border-amber-500');
+          btn.classList.remove('bg-[#dfab00]', 'text-slate-950', 'border-[#dfab00]');
           btn.classList.add('bg-white', 'text-slate-700');
         }
       });
@@ -183,51 +228,39 @@
     function renderDaySchedule() {
       const container = document.getElementById('dayScheduleList');
       container.innerHTML = '';
-
       const daySchedules = currentSchedule.filter(s => s.day === selectedDay);
 
       if (daySchedules.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-10 text-slate-400 text-sm space-y-2">
-            <p>لا توجد حصص محفوظة لهذا اليوم بعد.</p>
-            <p class="text-xs">اضغط على زر "+ إضافة حصة ثابتة" لتسجيل جدول هذا اليوم لتبقى محفوضة دائماً.</p>
-          </div>`;
+        container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">لا توجد حصص مسجلة لهذا اليوم. اضغط على "+ إضافة حصة" للبدء.</div>`;
         return;
       }
 
       daySchedules.forEach(s => {
         container.innerHTML += `
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+          <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 space-y-3">
             <div class="flex justify-between items-start">
               <div>
-                <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded">${s.time}</span>
-                <h4 class="font-bold text-slate-800 text-base mt-1">${s.subject}</h4>
+                <span class="bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold px-2 py-0.5 rounded">${s.time}</span>
+                <h4 class="font-bold text-slate-800 text-sm mt-1">${s.subject}</h4>
                 <p class="text-xs text-slate-500">الأستاذ: ${s.teacher} | المكان: ${s.room}</p>
               </div>
-              <button onclick="deleteSchedule('${s.id}')" class="text-rose-500 hover:text-rose-700 text-xs font-semibold px-2 py-1 bg-rose-50 rounded border border-rose-100">حذف الحصة 🗑️</button>
+              <button onclick="deleteSchedule('${s.id}')" class="text-rose-500 hover:text-rose-700 text-[11px] font-semibold px-2 py-1 bg-rose-50 rounded border border-rose-100">حذف 🗑️</button>
             </div>
 
-            <!-- أزرار الإنجاز -->
-            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200/60">
-              <button onclick="submitReport('${s.id}', '${s.subject}', '${s.teacher}', '${s.time}', 'completed')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs py-2 rounded-lg font-bold transition">تم الإنجاز 🟢</button>
-              <button onclick="submitReport('${s.id}', '${s.subject}', '${s.teacher}', '${s.time}', 'absent')" class="bg-rose-600 hover:bg-rose-700 text-white text-xs py-2 rounded-lg font-bold transition">لم تدرس 🔴</button>
-              <button onclick="submitReport('${s.id}', '${s.subject}', '${s.teacher}', '${s.time}', 'delayed')" class="bg-amber-500 hover:bg-amber-600 text-white text-xs py-2 rounded-lg font-bold transition">تأخر/تغيير 🟠</button>
+            <!-- خياران فقط: تم الإنجاز / لم تدرس -->
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/60">
+              <button onclick="submitReport('${s.id}', '${s.subject}', '${s.teacher}', '${s.time}', 'completed')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs py-2.5 rounded-lg font-bold transition shadow-sm">🟢 تم الإنجاز</button>
+              <button onclick="submitReport('${s.id}', '${s.subject}', '${s.teacher}', '${s.time}', 'absent')" class="bg-rose-600 hover:bg-rose-700 text-white text-xs py-2.5 rounded-lg font-bold transition shadow-sm">🔴 لم تدرس (غياب)</button>
             </div>
-            <input type="text" id="notes_${s.id}" placeholder="ملاحظة إضافية (اختياري)..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none focus:border-amber-500">
+            
+            <input type="text" id="notes_${s.id}" placeholder="ملاحظة إضافية (اختياري)..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs outline-none focus:border-[#0c5e2a]">
           </div>
         `;
       });
     }
 
-    function openAddModal() {
-      document.getElementById('addModal').classList.remove('hidden');
-      document.getElementById('addModal').classList.add('flex');
-    }
-
-    function closeAddModal() {
-      document.getElementById('addModal').classList.remove('flex');
-      document.getElementById('addModal').classList.add('hidden');
-    }
+    function openAddModal() { document.getElementById('addModal').classList.remove('hidden'); document.getElementById('addModal').classList.add('flex'); }
+    function closeAddModal() { document.getElementById('addModal').classList.remove('flex'); document.getElementById('addModal').classList.add('hidden'); }
 
     async function saveNewSchedule() {
       const time = document.getElementById('modalTime').value;
@@ -235,48 +268,30 @@
       const teacher = document.getElementById('modalTeacher').value.trim();
       const room = document.getElementById('modalRoom').value.trim();
 
-      if (!subject || !teacher) {
-        alert('يرجى إدخال اسم المقياس والأستاذ على الأقل.');
-        return;
-      }
+      if (!subject || !teacher) { alert('يرجى إدخال اسم المقياس والأستاذ.'); return; }
 
-      try {
-        const res = await fetch('/api/schedules', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ groupId: currentGroup.id, day: selectedDay, time, subject, teacher, room })
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-          currentSchedule.push(data.schedule);
-          closeAddModal();
-          renderDaySchedule();
-          // تفريغ الحقول
-          document.getElementById('modalSubject').value = '';
-          document.getElementById('modalTeacher').value = '';
-          document.getElementById('modalRoom').value = '';
-        } else {
-          alert(data.error);
-        }
-      } catch (e) {
-        alert('خطأ في الاتصال بالخادم.');
+      const res = await fetch('/api/schedules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ groupId: currentGroup.id, day: selectedDay, time, subject, teacher, room })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        currentSchedule.push(data.schedule);
+        closeAddModal();
+        renderDaySchedule();
+        document.getElementById('modalSubject').value = '';
+        document.getElementById('modalTeacher').value = '';
+        document.getElementById('modalRoom').value = '';
       }
     }
 
     async function deleteSchedule(scheduleId) {
-      if (!confirm('هل أنت متأكد من حذف هذه الحصة من الجدول الثابت؟')) return;
-
-      try {
-        const res = await fetch(`/api/schedules/${scheduleId}`, { method: 'DELETE' });
-        if (res.ok) {
-          currentSchedule = currentSchedule.filter(s => s.id !== scheduleId);
-          renderDaySchedule();
-        } else {
-          alert('فشل في حذف الحصة');
-        }
-      } catch (e) {
-        alert('خطأ في الاتصال.');
+      if (!confirm('حذف هذه الحصة؟')) return;
+      const res = await fetch(`/api/schedules/${scheduleId}`, { method: 'DELETE' });
+      if (res.ok) {
+        currentSchedule = currentSchedule.filter(s => s.id !== scheduleId);
+        renderDaySchedule();
       }
     }
 
@@ -285,30 +300,16 @@
       const notesInput = document.getElementById(`notes_${scheduleId}`);
       const notes = notesInput ? notesInput.value.trim() : '';
 
-      try {
-        const res = await fetch('/api/reports', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            groupId: currentGroup.id,
-            scheduleId,
-            subject,
-            teacher,
-            time,
-            status,
-            notes,
-            delegateName
-          })
-        });
-
-        if (res.ok) {
-          alert('✅ تم إرسال تقرير الحصة بنجاح إلى الإدارة');
-          if(notesInput) notesInput.value = '';
-        } else {
-          alert('❌ حدث خطأ أثناء إرسال التقرير');
-        }
-      } catch (e) {
-        alert('❌ خطأ في الاتصال بالخادم');
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ groupId: currentGroup.id, scheduleId, subject, teacher, time, status, notes, delegateName })
+      });
+      if (res.ok) {
+        alert('✅ تم إرسال وتوثيق التقرير بنجاح');
+        if(notesInput) notesInput.value = '';
+      } else {
+        alert('حدث خطأ أثناء إرسال التقرير');
       }
     }
 

@@ -2,35 +2,41 @@
 
 body {
   font-family: 'Cairo', sans-serif;
-  background-color: #fcfbf9;
+  background-color: #ffffff;
 }
 
-/* خلفية هندسية متناسقة وناعمة */
+/* زيادة كثافة الألوان والتموجات الضبابية لتظهر بوضوح وحيوية */
 .bg-subtle {
-  background-color: #fcfbf9;
-  background-image: url('../assets/bg-pattern.svg');
+  background-color: #ffffff;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(12, 94, 42, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(223, 171, 0, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(12, 94, 42, 0.07) 0%, transparent 60%),
+    url('../assets/bg-pattern.svg');
   background-repeat: repeat;
-  background-size: 45px 45px;
+  background-size: auto, auto, auto, 45px 45px;
 }
 
-/* تأثير الزجاج الشفاف الراقي للرأسية والبطاقات */
+/* تأثير الزجاج الشفاف للرأسية والبطاقات مع ظل أعمق ليبرز فوق التموجات الواضحة */
 .glass-header {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.90);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 2px solid rgba(12, 94, 42, 0.15);
+  border-bottom: 1px solid rgba(12, 94, 42, 0.18);
+  box-shadow: 0 4px 20px -2px rgba(12, 94, 42, 0.06);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  box-shadow: 0 10px 25px -5px rgba(12, 94, 42, 0.08), 0 8px 10px -6px rgba(223, 171, 0, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .glass-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 40px -12px rgba(12, 94, 42, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 35px -10px rgba(12, 94, 42, 0.15);
   border-color: #dfab00;
 }
 
@@ -41,7 +47,7 @@ body {
 }
 
 .glass-card:hover .arrow {
-  transform: translateX(-6px);
+  transform: translateX(-4px);
   color: #0c5e2a;
 }
 
@@ -50,7 +56,7 @@ body {
 }
 
 .icon-box, .arrow, .card-title {
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
 a:focus-visible {
